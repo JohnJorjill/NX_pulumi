@@ -1,0 +1,84 @@
+{
+  "name": "my-lambda-app",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "my-lambda-app/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/my-lambda-app",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "my-lambda-app/src/main.ts",
+        "tsConfig": "my-lambda-app/tsconfig.app.json",
+        "assets": ["my-lambda-app/src/assets"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "my-lambda-app:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "my-lambda-app:build:development"
+        },
+        "production": {
+          "buildTarget": "my-lambda-app:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["my-lambda-app/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "my-lambda-app/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "cd ./my-lambda-app && sls offline --stage local --noTimeout"
+      }
+    }
+  },
+  "tags": []
+}
